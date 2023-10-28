@@ -65,8 +65,6 @@ void Error_Handler(void);
 #define ENC_A2_GPIO_Port GPIOA
 #define ENC_B2_Pin GPIO_PIN_5
 #define ENC_B2_GPIO_Port GPIOA
-#define Servo_Pin GPIO_PIN_0
-#define Servo_GPIO_Port GPIOB
 #define IN4_1_Pin GPIO_PIN_1
 #define IN4_1_GPIO_Port GPIOB
 #define IN4_2_Pin GPIO_PIN_2

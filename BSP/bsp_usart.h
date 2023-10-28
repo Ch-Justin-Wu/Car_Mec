@@ -21,6 +21,20 @@
 #include "usart.h"
 #include "dma.h"
 
+// Defines the serial port receive buff length
+//  定义串口接收buff长度,防止DMA传输越界
+#define BUF_SIZE 36u
+#define DATA_FRAME_LENGTH 18u
+
+// Use DEFINE to improve code portability
+// 用define提高代码易移植性
+#define c_huart huart2
+#define c_UART USART2
+#define c_dma hdma_usart2_rx
+
+
+extern DMA_HandleTypeDef c_dma;
+
 // 定义按钮状态的枚举
 enum ButtonState
 {
@@ -49,16 +63,7 @@ typedef __packed struct
     uint8_t combination;
 } Controller_t;
 
-// Defines the serial port receive buff length
-//  定义串口接收buff长度,防止DMA传输越界
-#define BUF_SIZE 36u
-#define DATA_FRAME_LENGTH 18u
 
-// Use DEFINE to improve code portability
-// 用define提高代码易移植性
-#define c_huart huart1
-#define c_UART USART1
-#define c_dma hdma_usart1_rx
 
 extern uint8_t *rx_p;
 extern uint8_t err;

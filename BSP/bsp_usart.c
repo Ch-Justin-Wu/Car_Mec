@@ -65,30 +65,30 @@ void DMA_Usart_Rx(uint8_t *Data, uint8_t len)
 /**
  * @brief This function handles USART1 global interrupt.
  */
-void USART1_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
 
 	uint32_t tmp_flag = 0;
 	uint32_t temp;
 
 	// Get the IDLE flag bit
-	tmp_flag = __HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE);
+	tmp_flag = __HAL_UART_GET_FLAG(&c_huart, UART_FLAG_IDLE);
 
 	if (tmp_flag != RESET)
 	{
 		// Clear the IDLE flag in UART
-		__HAL_UART_CLEAR_IDLEFLAG(&huart1);
+		__HAL_UART_CLEAR_IDLEFLAG(&c_huart);
 
 		// Clear the status register (SR)
-		temp = huart1.Instance->SR;
+		temp = c_huart.Instance->SR;
 
 		// Read data from DR (Data Register)
-		temp = huart1.Instance->DR;
+		temp = c_huart.Instance->DR;
 
-		HAL_UART_DMAStop(&huart1); // Stop DMA transfer
+		HAL_UART_DMAStop(&c_huart); // Stop DMA transfer
 
 		// Get the number of untransmitted data in DMA
-		temp = hdma_usart1_rx.Instance->CNDTR;
+		temp = c_dma.Instance->CNDTR;
 
 		// Calculate the number of received data by subtracting the total count from the untransmitted data count
 		rx_len = BUF_SIZE - temp;
@@ -97,7 +97,16 @@ void USART1_IRQHandler(void)
 		recv_end_flag = 1;
 	}
 
-	HAL_UART_IRQHandler(&huart1);
+	HAL_UART_IRQHandler(&c_huart);
+}
+
+int fputc(int ch, FILE *f)
+
+{
+
+	HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xffff);
+
+	return ch;
 }
 
 // 定义按钮名称的数组
@@ -287,10 +296,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		// pid_reset(&pid_angle[1], kp_ang_2, ki_ang_2, kd_ang_2);
 		// 角速度计算
 
-		
 		// angle_setspeed_1=pid_calc(&pid_angle[0], (float)moto_chassis[0].total_angle/ 8192.0f * 360.0f-(float)moto_chassis[1].total_angle/ 8192.0f * 360.0f, 0.0f);
 		//  PID 电流力矩计算
-		
+
 		short torque1 = pid_calc(&pid_motor[0], (float)moto_chassis[0].speed_rpm, 0);
 		// can_cmd_send(torque1, torque2);
 		// 角速度计算
@@ -299,10 +307,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		// angle_setspeed_2=pid_calc(&pid_angle[1], (float)moto_chassis[1].total_angle/ 8192.0f * 360.0f-(float)moto_chassis[0].total_angle/ 8192.0f * 360.0f, 0.0f);
 
 		//  PID 电流力矩计算
-		
-		short torque2 = pid_calc(&pid_motor[1], (float)moto_chassis[1].speed_rpm, 0
-		);
+
+		short torque2 = pid_calc(&pid_motor[1], (float)moto_chassis[1].speed_rpm, 0);
 		// real_speed2 = moto_chassis[1].speed_rpm;
-	
 	}
 }
